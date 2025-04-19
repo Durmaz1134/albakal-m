@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Yönetici Paneli</title>
+</head>
+<body>
+  <h1>Çalışan Konumları ve Gökyüzü Görüntüleri</h1>
+  <table border="1" cellpadding="8">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Enlem</th>
+        <th>Boylam</th>
+        <th>Tarih</th>
+        <th>Gökyüzü Haritası</th>
+      </tr>
+    </thead>
+    <tbody id="liste">
+    </tbody>
+  </table>
+
+  <script>
+    fetch("/konumlar")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById("liste");
+        data.forEach((k, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${i+1}</td>
+            <td>${k.latitude.toFixed(5)}</td>
+            <td>${k.longitude.toFixed(5)}</td>
+            <td>${new Date(k.tarih).toLocaleString()}</td>
+            <td><a href="${k.skyMapLink}" target="_blank">Göster</a></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+  </script>
+</body>
+</html>

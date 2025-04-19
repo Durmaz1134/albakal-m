@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gökyüzü Haritası</title>
+</head>
+<body>
+  <h1>Konum Alınıyor...</h1>
+  <div id="skyview" style="width:100%; height:600px;"></div>
+
+  <script>
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      fetch("/konum-guncelle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ latitude: lat, longitude: lon })
+      });
+
+      const skyUrl = `https://virtualsky.lco.global/embed/index.html?longitude=${lon}&latitude=${lat}&constellations=true&gridlines_az=true&live=true`;
+      document.getElementById("skyview").innerHTML = `<iframe src="${skyUrl}" width="100%" height="600px" frameborder="0"></iframe>`;
+    });
+  </script>
+</body>
+</html>
