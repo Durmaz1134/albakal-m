@@ -3,24 +3,223 @@
 <head>
   <meta charset="UTF-8">
   <title>Gökyüzü Haritası</title>
+  <style>
+    :root {
+      --space-blue: #0b0e23;
+      --neon-blue: #4fc3f7;
+      --star-yellow: #ffeb3b;
+    }
+    
+    body {
+      background-color: var(--space-blue);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(31, 38, 135, 0.3) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(255, 152, 0, 0.2) 0%, transparent 30%),
+        linear-gradient(to bottom, #000000 0%, var(--space-blue) 100%);
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    h1 {
+      color: var(--neon-blue);
+      margin: 0;
+      font-size: 2.2em;
+      text-shadow: 0 0 15px rgba(79, 195, 247, 0.7);
+      letter-spacing: 1px;
+    }
+
+    .coordinates {
+      color: var(--star-yellow);
+      font-size: 1.1em;
+      margin-top: 8px;
+    }
+
+    #skyview-container {
+      width: 95%;
+      max-width: 1200px;
+      height: 70vh;
+      min-height: 500px;
+      margin: 0 auto;
+      position: relative;
+      border: 2px solid var(--neon-blue);
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(79, 195, 247, 0.4);
+      overflow: hidden;
+    }
+
+    #skyview {
+      width: 100%;
+      height: 100%;
+      background: black;
+    }
+
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--neon-blue);
+      font-size: 1.5em;
+      text-align: center;
+    }
+
+    .constellation-guide {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+      margin: 30px auto;
+      max-width: 900px;
+      background: rgba(11, 14, 35, 0.7);
+      border-radius: 10px;
+      border: 1px solid var(--neon-blue);
+    }
+
+    .constellation-card {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--neon-blue);
+      border-radius: 8px;
+      padding: 12px 15px;
+      width: 200px;
+      transition: all 0.3s ease;
+    }
+
+    .constellation-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(79, 195, 247, 0.3);
+    }
+
+    .constellation-name {
+      color: var(--neon-blue);
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 1.1em;
+    }
+
+    .constellation-desc {
+      color: #aaa;
+      font-size: 0.9em;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 768px) {
+      #skyview-container {
+        width: 100%;
+        height: 60vh;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
+      
+      .constellation-card {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Konum Alınıyor...</h1>
-  <div id="skyview" style="width:100%; height:600px;"></div>
+  <div class="header">
+    <h1>Gökyüzü Keşif Haritası</h1>
+    <div class="coordinates" id="coordinates">Konum bekleniyor...</div>
+  </div>
+
+  <div id="skyview-container">
+    <div id="skyview">
+      <div class="loading">
+        <div>Konumunuz alınıyor...</div>
+        <div style="font-size: 0.7em; margin-top: 10px;">Lütfen konum erişimine izin verin</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="constellation-guide">
+    <div class="constellation-card">
+      <div class="constellation-name">Orion (Avcı)</div>
+      <div class="constellation-desc">Belt (Kemer) yıldızlarıyla ünlü</div>
+    </div>
+    <div class="constellation-card">
+      <div class="constellation-name">Ursa Major (Büyük Ayı)</div>
+      <div class="constellation-desc">Büyük Kepçe asterizmini içerir</div>
+    </div>
+    <div class="constellation-card">
+      <div class="constellation-name">Lyra (Lir)</div>
+      <div class="constellation-desc">Parlak Vega yıldızını içerir</div>
+    </div>
+    <div class="constellation-card">
+      <div class="constellation-name">Scorpius (Akrep)</div>
+      <div class="constellation-desc">Kırmızı Antares yıldızıyla bilinir</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Gerçek zamanlı gökyüzü haritası | Virtual Sky API
+  </div>
 
   <script>
     navigator.geolocation.getCurrentPosition(function(position) {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
-
+      
+      // Koordinatları güncelle
+      document.getElementById('coordinates').textContent = 
+        `Enlem: ${lat.toFixed(4)}° | Boylam: ${lon.toFixed(4)}°`;
+      
+      // Konumu sunucuya gönder
       fetch("/konum-guncelle", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ latitude: lat, longitude: lon })
       });
-
+      
+      // Virtual Sky haritasını yükle (TÜM GÖRSEL AYARLAR AKTİF)
+      // const skyUrl = `https://virtualsky.lco.global/embed/index.html?longitude=${lon}&latitude=${lat}&constellations=true&constellationlabels=true&constellationboundaries=true&showstars=true&showplanets=true&showdate=false&showposition=false&gridlines_az=true&live=true&projection=stereo&showstarlabels=true&magnitude=6`;
+      
       const skyUrl = `https://virtualsky.lco.global/embed/index.html?longitude=${lon}&latitude=${lat}&constellations=true&gridlines_az=true&live=true`;
       document.getElementById("skyview").innerHTML = `<iframe src="${skyUrl}" width="100%" height="600px" frameborder="0"></iframe>`;
+    
+
+
+      document.getElementById("skyview").innerHTML = `
+        <iframe 
+          src="${skyUrl}" 
+          width="100%" 
+          height="100%" 
+          frameborder="0"
+          style="background: transparent;"
+          allowfullscreen
+        ></iframe>
+      `;
+      
+    }, function(error) {
+      document.querySelector(".loading").innerHTML = `
+        <div style="color: #ff5252;">Konum erişimi reddedildi</div>
+        <div style="margin-top: 15px;">Varsayılan konum kullanılıyor...</div>
+      `;
+      
+      // Varsayılan konum (İstanbul)
+      const defaultLat = 41.0082;
+      const defaultLon = 28.9784;
+      document.getElementById('coordinates').textContent = 
+        `Varsayılan konum: Enlem: ${defaultLat.toFixed(4)}° | Boylam: ${defaultLon.toFixed(4)}°`;
+      
+      const skyUrl = `https://virtualsky.lco.global/embed/index.html?longitude=${defaultLon}&latitude=${defaultLat}&constellations=true&constellationlabels=true&constellationboundaries=true&showstars=true&showplanets=true&gridlines_az=true&live=true`;
+      document.getElementById("skyview").innerHTML = `<iframe src="${skyUrl}" width="100%" height="100%" frameborder="0"></iframe>`;
     });
   </script>
 </body>
