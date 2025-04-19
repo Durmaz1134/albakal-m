@@ -15,6 +15,13 @@ if (fs.existsSync(DATA_FILE)) {
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
+
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/çalışan.html'); // Varsayılan sayfa olarak çalışan.html açılır
+});
+
+
 app.get('/yonetici', (req, res) => {
   res.sendFile(__dirname + '/public/yönetici.html');
 });
