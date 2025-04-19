@@ -54,6 +54,8 @@ app.all('/konumlar', (req, res, next) => {
   next();
 });
 
-app.listen(port, () => {
-  console.log(`Sunucu http://localhost:${port} adresinde çalışıyor`);
+// Sunucu başlatma kısmını değiştirin
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Sunucu http://localhost:${PORT} adresinde çalışıyor`);
 });
